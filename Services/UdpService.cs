@@ -14,12 +14,13 @@ public class UdpService
 
     private UdpClient _udpClient;
     private CancellationTokenSource _cts;
-    private readonly int _port = 11000;
+    private readonly int _port = 5000;
 
     public UdpService()
     {
         _udpClient = new UdpClient();
         _udpClient.EnableBroadcast = true;
+        _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         try
         {
             _udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, _port));
@@ -45,7 +46,7 @@ public class UdpService
             {
                 UdpReceiveResult result = await _udpClient.ReceiveAsync();
                 string userName = Encoding.UTF8.GetString(result.Buffer);
-                Console.WriteLine($"{userName}");
+                Console.WriteLine(userName);
                 ChatNode discoveredNode = new ChatNode();
                 OnNodeDiscovered?.Invoke(discoveredNode);
             }
@@ -60,9 +61,9 @@ public class UdpService
         
     }
 
-    public async Task BroadcastPresenceAsync()
+    public async Task BroadcastPresenceAsync(string userName)
     {
-        byte[] data = Encoding.UTF8.GetBytes("userName");
+        byte[] data = Encoding.UTF8.GetBytes(userName);
         IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, _port);
         try
         {

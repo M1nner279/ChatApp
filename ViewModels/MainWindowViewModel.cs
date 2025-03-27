@@ -8,6 +8,8 @@ namespace ChatApp.ViewModels;
 public partial class MainWindowViewModel : ReactiveObject
 {
     private readonly UdpService _udpService;
+
+    private readonly string userName = "SOSI";
     
     public string Greeting { get; } = "Welcome to Chat";
     public ObservableCollection<ChatMessage> ChatMessages;
@@ -19,6 +21,6 @@ public partial class MainWindowViewModel : ReactiveObject
         
         _udpService.StartListening();
         
-        _ = _udpService.BroadcastPresenceAsync();
+        _ = _udpService.BroadcastPresenceAsync(userName);
     }
 }

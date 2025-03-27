@@ -1,0 +1,55 @@
+name: Build and Release Avalonia App
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+    branches:
+      - master
+      - dev
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet publish -c Release -r win-x64 --self-contained true -o ./publish/win
+
+      - name: Build for Linux
+        run: dotnet publish -c Release -r linux-x64 --self-contained true -o ./publish/linux
+
+      - name: Build for macOS
+        run: dotnet publish -c Release -r osx-x64 --self-contained true -o ./publish/macos
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-windows
+          path: ./publish/win/
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-linux
+          path: ./publish/linux/
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-macos
+          path: ./publish/macos/
