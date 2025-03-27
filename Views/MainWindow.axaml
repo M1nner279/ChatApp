@@ -3,6 +3,7 @@
         xmlns:vm="using:ChatApp.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:rxui="clr-namespace:ReactiveUI;assembly=ReactiveUI"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="ChatApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -16,11 +17,24 @@
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Vertical" >
             <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center"/>
-            
+            <ListBox ItemsSource="{Binding ChatMessages}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Margin="0,0,0,5" Padding="5">
+                            <StackPanel>
+                                <!-- <StackPanel Orientation="Horizontal"> -->
+                                <!--     <TextBlock Text="{Binding TimeStamp, StringFormat='[{0:HH:mm:ss}]'}" FontStyle="Italic" Margin="0,0,5,0"/> -->
+                                <!--     <TextBlock Text="{Binding SenderName}" FontWeight="Bold" Margin="0,0,5,0"/> -->
+                                <!--     <TextBlock Text=":" FontWeight="Bold"/> -->
+                                <!-- </StackPanel> -->
+                                <!-- <TextBlock Text="{Binding Content}" TextWrapping="Wrap"/> -->
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
+        
+        
     </DockPanel>
-    
-    
-    
-
 </Window>

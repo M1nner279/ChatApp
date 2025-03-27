@@ -47,7 +47,12 @@ public class UdpService
                 UdpReceiveResult result = await _udpClient.ReceiveAsync();
                 string userName = Encoding.UTF8.GetString(result.Buffer);
                 Console.WriteLine($"{userName}");
-                ChatNode discoveredNode = new ChatNode();
+                ChatNode discoveredNode = new ChatNode
+                {
+                    IpAddress = result.RemoteEndPoint.Address.ToString(),
+                    UserName = userName,
+                    IsConnected = false
+                };
                 OnNodeDiscovered?.Invoke(discoveredNode);
             }
         }
@@ -61,9 +66,9 @@ public class UdpService
         
     }
 
-    public async Task BroadcastPresenceAsync()
+    public async Task BroadcastPresenceAsync(string userName)
     {
-        byte[] data = Encoding.UTF8.GetBytes("userName");
+        byte[] data = Encoding.UTF8.GetBytes(userName);
         IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, _port);
         try
         {
