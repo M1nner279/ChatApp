@@ -1,60 +1,53 @@
-name: Build and Publish Artifacts
+name: Build and Release Avalonia App
 
 on:
   push:
     branches:
       - master
   pull_request:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '7.0.x'
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build project
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Publish for Windows
-        run: dotnet publish -c Release -r win-x64 --self-contained false -o published
-
-      - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ChatApp-windows
-          path: published
-
-  build-linux:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0.x'
+          dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
+      - name: Install dependencies
         run: dotnet restore
 
       - name: Build project
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet publish -c Release -r win-x64 --self-contained true -o ./publish/win
 
-      - name: Publish for Linux
-        run: dotnet publish -c Release -r linux-x64 --self-contained false -o published
+      - name: Build for Linux
+        run: dotnet publish -c Release -r linux-x64 --self-contained true -o ./publish/linux
 
-      - name: Upload Linux Artifact
-        uses: actions/upload-artifact@v3
+      - name: Build for macOS
+        run: dotnet publish -c Release -r osx-x64 --self-contained true -o ./publish/macos
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: ChatApp-linux
-          path: published
+          name: app-windows
+          path: ./publish/win/
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-linux
+          path: ./publish/linux/
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-macos
+          path: ./publish/macos/
