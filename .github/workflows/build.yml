@@ -1,4 +1,4 @@
-name: Build and Release Avalonia App
+name: Build Avalonia App
 
 on:
   push:

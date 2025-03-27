@@ -9,7 +9,7 @@ public partial class MainWindowViewModel : ReactiveObject
 {
     private readonly UdpService _udpService;
 
-    private readonly string userName = "SOSI";
+    private readonly string userName = "Host";
     
     public string Greeting { get; } = "Welcome to Chat";
     public ObservableCollection<ChatMessage> ChatMessages;
