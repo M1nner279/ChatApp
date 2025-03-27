@@ -21,6 +21,7 @@ public class UdpService
         
         _udpClient = new UdpClient();
         _udpClient.EnableBroadcast = true;
+        _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         try
         {
             _udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, _port));

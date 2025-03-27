@@ -29,7 +29,15 @@ public class TcpService
     public void startServer()
     {
         _cts = new CancellationTokenSource();
-        _listener.Start();
+        _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+        try
+        {
+            _listener.Start();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error TcpStart: {ex.Message}");
+        }
         Task.Run(() => AcceptClientAsync(_cts.Token));
     }
     
