@@ -1,0 +1,59 @@
+name: Build and Test Multiple Projects
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        project:
+          - ChatApp.csproj
+        include:
+          - project: ChatApp.csproj
+            artifact-name: ChatApp
+        # Указываем RID для каждой ОС
+        rid:
+          - linux-x64
+          - win-x64
+        exclude:
+          # Исключаем некорректные комбинации OS и RID
+          - os: ubuntu-latest
+            rid: win-x64
+          - os: windows-latest
+            rid: linux-x64
+
+    steps:
+      # 1. Клонируем репозиторий
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Устанавливаем .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # 3. Восстанавливаем зависимости для конкретного проекта
+      - name: Restore dependencies
+        run: dotnet restore ${{ matrix.project }}
+
+      # 4. Компилируем проект
+      - name: Build
+        run: dotnet build ${{ matrix.project }} --configuration Release --no-restore
+
+      # 5. Публикуем артефакты как self-contained
+      - name: Publish artifacts
+        run: |
+          dotnet publish ${{ matrix.project }} -c Release -r ${{ matrix.rid }} --self-contained true -o ./publish/${{ matrix.artifact-name }}-${{ matrix.os }}-${{ matrix.rid }} -p:PublishTrimmed=true
+        if: success()
+
+      # 6. Загружаем артефакты в GitHub
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}-${{ matrix.os }}-${{ matrix.rid }}-build
+          path: ./publish/${{ matrix.artifact-name }}-${{ matrix.os }}-${{ matrix.rid }}
